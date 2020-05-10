@@ -1,0 +1,65 @@
+package com.example.clone_insta.Adapter;
+
+import android.content.Context;
+import android.media.Image;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.example.clone_insta.Fragments.PostDetailFragment;
+import com.example.clone_insta.Model.Post;
+import com.example.clone_insta.R;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder>{
+    private Context mContext;
+    private List<Post> mPost;
+
+    public PhotoAdapter(Context mContext, List<Post> mPost) {
+        this.mContext = mContext;
+        this.mPost = mPost;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view=LayoutInflater.from(mContext).inflate(R.layout.photo_item, parent, false);
+        return new PhotoAdapter.ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final Post post=mPost.get(position);
+        Picasso.get().load(post.getImageUrl()).placeholder(R.mipmap.ic_launcher);
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.getSharedPreferences("PREFS",Context.MODE_PRIVATE)
+                        .edit().putString("postid",post.getPostId()).apply();
+                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,new PostDetailFragment()).commit();
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return mPost.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        public ImageView postImage;
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            postImage= itemView.findViewById(R.id.post_image);
+
+        }
+    }
+}
